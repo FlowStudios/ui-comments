@@ -12,13 +12,34 @@
     "README.md"
   ],
   "exports": {
-    ".": "./server/github.js",
-    "./client/ui-comments.js": "./client/ui-comments.js",
-    "./react/UIComments": "./react/UIComments.js",
-    "./server/github": "./server/github.js",
-    "./server/next-route": "./server/next-route.js"
+    ".": {
+      "types": "./server/github.d.ts",
+      "default": "./server/github.js"
+    },
+    "./client/ui-comments.js": {
+      "types": "./client/ui-comments.d.ts",
+      "default": "./client/ui-comments.js"
+    },
+    "./react/UIComments": {
+      "types": "./react/UIComments.d.ts",
+      "default": "./react/UIComments.js"
+    },
+    "./server/github": {
+      "types": "./server/github.d.ts",
+      "default": "./server/github.js"
+    },
+    "./server/next-route": {
+      "types": "./server/next-route.d.ts",
+      "default": "./server/next-route.js"
+    }
   },
-  "keywords": ["github", "issues", "feedback", "ui", "design-review"],
+  "keywords": [
+    "github",
+    "issues",
+    "feedback",
+    "ui",
+    "design-review"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/FlowStudios/ui-comments.git"
@@ -27,7 +48,12 @@
     "react": ">=18"
   },
   "peerDependenciesMeta": {
-    "react": { "optional": true }
+    "react": {
+      "optional": true
+    }
   },
-  "engines": { "node": ">=18" }
+  "engines": {
+    "node": ">=18"
+  },
+  "types": "server/github.d.ts"
 }
