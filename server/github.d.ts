@@ -13,6 +13,11 @@ export interface UICommentsConfig {
    * $UI_COMMENTS_KEY. Required on any app without its own auth.
    */
   key?: string;
+  /**
+   * Refuse every request (503) when no key is configured, instead of running
+   * as an open endpoint. Set this on any app without its own login.
+   */
+  requireKey?: boolean;
   /** Per-process cap. Pass null to disable. Default 20 per 10 minutes. */
   rateLimit?: { max?: number; windowMs?: number } | null;
 }

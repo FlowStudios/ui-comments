@@ -96,6 +96,10 @@ Off by default, so staff and customers never see the pill.
 **Read this before mounting it on a site without a login.** The endpoint writes
 to your issue tracker, so an open one is an invitation to spam it.
 
+Pass `requireKey: true` and the route refuses every request with a 503 while
+`UI_COMMENTS_KEY` is unset — so a forgotten env var fails shut instead of
+leaving the tracker open. Set it on any app without its own login.
+
 Set `UI_COMMENTS_KEY` and the endpoint rejects anything without a matching
 `X-UI-Comments-Key` header (sha256 + constant-time compare). The client picks
 the key up from the arming URL once and keeps it in `localStorage` — so the
@@ -152,6 +156,7 @@ own endpoint.
 | `repo` | `$UI_COMMENTS_REPO` | `owner/repo` |
 | `token` | `$UI_COMMENTS_GH_TOKEN` | fine-grained PAT |
 | `key` | `$UI_COMMENTS_KEY` | shared secret; unset = open endpoint |
+| `requireKey` | `false` | 503 rather than run open |
 | `rateLimit` | 20 / 10 min | `{ max, windowMs }`, or `null` |
 | `label` | `ui-comment` | created if missing; `null` for none |
 | `titlePrefix` | `[UI] ` | |

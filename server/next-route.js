@@ -50,9 +50,16 @@ function createUiCommentRoute(config = {}) {
   return async function POST(request) {
     const secret = config.key !== undefined ? config.key : process.env.UI_COMMENTS_KEY;
 
-    /* When a secret is configured the endpoint is closed by default — an
-       unauthenticated Next app is otherwise an open door onto the repo's
-       issue tracker. */
+    /* An app with no login of its own should never fall back to an open
+       endpoint because someone forgot an env var. requireKey makes a missing
+       secret a 503 instead of a wide-open door onto the issue tracker. */
+    if (config.requireKey && !secret) {
+      return Response.json(
+        { error: 'ui-comments is not configured (UI_COMMENTS_KEY missing).' },
+        { status: 503 },
+      );
+    }
+
     if (secret) {
       const sent = request.headers.get('x-ui-comments-key') || '';
       if (!sent || !sameSecret(sent, secret)) {
