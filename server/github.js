@@ -39,6 +39,37 @@ function kv(rows) {
   return lines.join('\n');
 }
 
+/* Shell-quote for single quotes. */
+function sq(str) {
+  return `'${String(str).replace(/'/g, "'\\''")}'`;
+}
+
+/* A ready-to-run search for whoever opens the issue. Text content beats class
+   names on a utility-class codebase — 'd-flex mb-3' matches everything, the
+   copy matches one component. A data-* attribute, when present, beats both. */
+function grepHint(el) {
+  const lines = [];
+  const attrs = el.attrs || {};
+  const named = Object.keys(attrs).filter((k) => k.indexOf('data-') === 0);
+
+  if (named.length) {
+    lines.push(`rg -n ${sq(named[0])} --glob '!node_modules'`);
+  }
+  if (el.text) {
+    // A few words is enough, and short enough to survive line wrapping in JSX.
+    const words = el.text.split(' ').slice(0, 6).join(' ');
+    lines.push(`rg -n ${sq(words)} --glob '!node_modules'`);
+  }
+  if (el.classes) {
+    const distinct = el.classes.split(' ').filter((c) => c.indexOf('-') > 0);
+    const pick = distinct.length ? distinct[0] : el.classes.split(' ')[0];
+    if (pick) {
+      lines.push(`rg -n ${sq(pick)} --glob '!node_modules'`);
+    }
+  }
+  return lines.join('\n');
+}
+
 /* The issue body is written for whoever picks the issue up — a person or
    Claude Code. Everything needed to locate the element in source, nothing
    that needs the original browser session. */
@@ -98,10 +129,18 @@ function bodyFrom(p) {
     out.push('</details>');
   }
 
+  const hint = grepHint(el);
+  if (hint) {
+    out.push('');
+    out.push('### Finding it in source');
+    out.push('');
+    out.push(fence('bash', hint));
+  }
+
   out.push('');
   out.push('<sub>Filed from the live page with [ui-comments](https://github.com/FlowStudios/ui-comments). '
-    + 'The class list and selector above are the identification handle — grep the source for the '
-    + 'text or classes to find the component.</sub>');
+    + 'The class list and selector above are the identification handle — there is no source map from a '
+    + 'rendered node back to a template.</sub>');
 
   return out.join('\n');
 }

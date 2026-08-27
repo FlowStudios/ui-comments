@@ -514,13 +514,28 @@
 
   /* --------------------------------------------------------------- submit */
 
+  /* The arming URL carries the shared secret. Reporting location.href verbatim
+     would publish that secret in the issue body, so strip our own params off
+     the reported URL. */
+  function reportedUrl() {
+    try {
+      var u = new URL(location.href);
+      u.searchParams.delete('uickey');
+      u.searchParams.delete('uicomment');
+      return u;
+    } catch (err) {
+      return null;
+    }
+  }
+
   function payloadFor(el, comment) {
+    var u = reportedUrl();
     return {
       comment: String(comment).slice(0, MAX_COMMENT),
       project: state.opts.project || '',
       page: {
-        url: location.href,
-        path: location.pathname + location.search,
+        url: u ? u.href : location.origin + location.pathname,
+        path: u ? u.pathname + u.search : location.pathname,
         title: document.title,
       },
       viewport: {

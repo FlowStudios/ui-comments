@@ -166,8 +166,43 @@ if (!empty($p['context'])) {
         . "\n```\n\n</details>\n";
 }
 
+// A ready-to-run search for whoever opens the issue. Text beats class names on
+// a utility-class codebase - 'd-flex mb-3' matches everything, the copy does not.
+$hints = array();
+if (!empty($el['attrs']) && is_array($el['attrs'])) {
+    foreach ($el['attrs'] as $k => $v) {
+        if (strpos($k, 'data-') === 0) {
+            $hints[] = "rg -n '" . str_replace("'", "'\\''", $k) . "' --glob '!node_modules'";
+            break;
+        }
+    }
+}
+if (!empty($el['text'])) {
+    $words = implode(' ', array_slice(explode(' ', $el['text']), 0, 6));
+    $hints[] = "rg -n '" . str_replace("'", "'\\''", $words) . "' --glob '!node_modules'";
+}
+if (!empty($el['classes'])) {
+    $pick = '';
+    foreach (explode(' ', $el['classes']) as $c) {
+        if (strpos($c, '-') > 0) {
+            $pick = $c;
+            break;
+        }
+    }
+    if ($pick === '') {
+        $parts = explode(' ', $el['classes']);
+        $pick = $parts[0];
+    }
+    if ($pick !== '') {
+        $hints[] = "rg -n '" . str_replace("'", "'\\''", $pick) . "' --glob '!node_modules'";
+    }
+}
+if ($hints) {
+    $body .= "\n### Finding it in source\n\n```bash\n" . implode("\n", $hints) . "\n```\n";
+}
+
 $body .= "\n<sub>Filed from the live page with ui-comments. The class list and selector above are the "
-    . "identification handle - grep the source for the text or classes to find the template.</sub>";
+    . "identification handle - there is no source map from a rendered node back to a template.</sub>";
 
 // An unknown label 422s the issue create, so make sure it exists first.
 $labels = array();
