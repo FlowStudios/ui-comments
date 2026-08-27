@@ -8,6 +8,13 @@ export interface UICommentsConfig {
   /** Prepended to the issue title. Default "[UI] ". */
   titlePrefix?: string;
   assignees?: string[];
+  /**
+   * Shared secret the client must send as X-UI-Comments-Key. Defaults to
+   * $UI_COMMENTS_KEY. Required on any app without its own auth.
+   */
+  key?: string;
+  /** Per-process cap. Pass null to disable. Default 20 per 10 minutes. */
+  rateLimit?: { max?: number; windowMs?: number } | null;
 }
 
 export interface UICommentPayload {

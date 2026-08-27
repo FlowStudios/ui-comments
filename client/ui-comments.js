@@ -15,6 +15,7 @@
   'use strict';
 
   var STORAGE_KEY = 'ui-comments';
+  var KEY_STORAGE = 'ui-comments.key';
   var NS = 'uic';
   var MAX_COMMENT = 4000;
   var MAX_HTML = 1200;
@@ -564,10 +565,16 @@
       body.context = extra;
     }
 
+    var headers = { 'Content-Type': 'application/json' };
+    var key = storedKey();
+    if (key) {
+      headers['X-UI-Comments-Key'] = key;
+    }
+
     fetch(state.opts.endpoint, {
       method: 'POST',
       credentials: 'same-origin',
-      headers: { 'Content-Type': 'application/json' },
+      headers: headers,
       body: JSON.stringify(body),
     })
       .then(function (res) {
@@ -671,15 +678,40 @@
 
   /* ----------------------------------------------------------------- init */
 
-  function armed(opts) {
-    if (opts.always) {
-      return true;
+  /* The shared secret the endpoint checks. It is never in the bundle or the
+     repo — it arrives once in the arming URL (?uicomment=1&uickey=…) and lives
+     in localStorage from then on. Anyone who has never been handed that link
+     cannot file, which is what keeps an unauthenticated endpoint from being an
+     open issue-spam hole. */
+  function storedKey() {
+    if (state.opts && state.opts.key) {
+      return state.opts.key;
     }
-    var q = null;
     try {
-      q = new URLSearchParams(location.search).get('uicomment');
+      return localStorage.getItem(KEY_STORAGE) || '';
+    } catch (err) {
+      return state.memKey || '';
+    }
+  }
+
+  function armed(opts) {
+    var q = null;
+    var k = null;
+    try {
+      var params = new URLSearchParams(location.search);
+      q = params.get('uicomment');
+      k = params.get('uickey');
     } catch (err) {
       q = null;
+    }
+    if (k) {
+      state.memKey = k;
+      try {
+        localStorage.setItem(KEY_STORAGE, k);
+      } catch (err) { /* ignore */ }
+    }
+    if (opts.always) {
+      return true;
     }
     try {
       if (q === '1' || q === 'on') {
@@ -688,6 +720,7 @@
       }
       if (q === '0' || q === 'off') {
         localStorage.removeItem(STORAGE_KEY);
+        localStorage.removeItem(KEY_STORAGE);
         return false;
       }
       return localStorage.getItem(STORAGE_KEY) === 'on';
@@ -739,6 +772,7 @@
     disable: function () {
       try {
         localStorage.removeItem(STORAGE_KEY);
+        localStorage.removeItem(KEY_STORAGE);
       } catch (err) { /* ignore */ }
       toggle(false);
     },

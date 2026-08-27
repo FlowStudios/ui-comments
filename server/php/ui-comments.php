@@ -23,6 +23,11 @@ if (!defined('UI_COMMENTS_GH_TOKEN')) {
 if (!defined('UI_COMMENTS_LABEL')) {
     define('UI_COMMENTS_LABEL', 'ui-comment');
 }
+// Shared secret the client must send as X-UI-Comments-Key. Leave empty ONLY if
+// this endpoint already sits behind your admin session check.
+if (!defined('UI_COMMENTS_KEY')) {
+    define('UI_COMMENTS_KEY', getenv('UI_COMMENTS_KEY') ?: '');
+}
 
 header('Content-Type: application/json');
 
@@ -81,6 +86,14 @@ function uic_github($method, $path, $payload = null)
 
 if (UI_COMMENTS_REPO === '' || UI_COMMENTS_GH_TOKEN === '') {
     uic_fail(500, 'ui-comments is not configured (repo/token missing).');
+}
+
+// hash_equals over sha256 so neither the value nor its length leaks.
+if (UI_COMMENTS_KEY !== '') {
+    $sent = isset($_SERVER['HTTP_X_UI_COMMENTS_KEY']) ? $_SERVER['HTTP_X_UI_COMMENTS_KEY'] : '';
+    if ($sent === '' || !hash_equals(hash('sha256', UI_COMMENTS_KEY), hash('sha256', $sent))) {
+        uic_fail(403, 'Not authorised to file comments.');
+    }
 }
 
 $raw = file_get_contents('php://input');

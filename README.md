@@ -59,6 +59,7 @@ import UIComments from 'ui-comments/react/UIComments';
 # .env / pm2 env — server-side only, never NEXT_PUBLIC_
 UI_COMMENTS_REPO=FlowStudios/rally
 UI_COMMENTS_GH_TOKEN=github_pat_...
+UI_COMMENTS_KEY=some-long-random-string
 ```
 
 ## PHP
@@ -86,12 +87,26 @@ Off by default, so staff and customers never see the pill.
 
 | | |
 |---|---|
-| `?uicomment=1` | arm it — sticky per browser via `localStorage` |
-| `?uicomment=0` | disarm |
-| `UIComments.init({ always: true })` | always on (dev, or an internal-only app) |
+| `?uicomment=1&uickey=SECRET` | arm it — sticky per browser via `localStorage` |
+| `?uicomment=0` | disarm, and forget the key |
+| `UIComments.init({ always: true })` | always show the pill (dev, or an app with its own auth) |
 
-Gating who *may* file is the endpoint's job — put it behind your existing admin
-session check if the page is public.
+## Locking the endpoint down
+
+**Read this before mounting it on a site without a login.** The endpoint writes
+to your issue tracker, so an open one is an invitation to spam it.
+
+Set `UI_COMMENTS_KEY` and the endpoint rejects anything without a matching
+`X-UI-Comments-Key` header (sha256 + constant-time compare). The client picks
+the key up from the arming URL once and keeps it in `localStorage` — so the
+secret is never in your repo, never in your client bundle, and someone probing
+`/api/ui-comment` cannot guess it. Hand out the arming link, not the key.
+
+The Next adapter also caps issues per process (20 per 10 minutes by default;
+`rateLimit: { max, windowMs }`, or `null` to turn it off), so a leaked link
+cannot file a thousand issues before you notice.
+
+If the app already has auth, put the route behind it and skip the key.
 
 ## Keys
 
@@ -136,6 +151,8 @@ own endpoint.
 |---|---|---|
 | `repo` | `$UI_COMMENTS_REPO` | `owner/repo` |
 | `token` | `$UI_COMMENTS_GH_TOKEN` | fine-grained PAT |
+| `key` | `$UI_COMMENTS_KEY` | shared secret; unset = open endpoint |
+| `rateLimit` | 20 / 10 min | `{ max, windowMs }`, or `null` |
 | `label` | `ui-comment` | created if missing; `null` for none |
 | `titlePrefix` | `[UI] ` | |
 | `assignees` | — | array of logins |

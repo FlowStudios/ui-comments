@@ -2,6 +2,12 @@ export interface UICommentsInitOptions {
   endpoint?: string;
   project?: string;
   always?: boolean;
+  /**
+   * Shared secret for the endpoint. Prefer NOT setting this — it would land in
+   * your client bundle. Arm with ?uicomment=1&uickey=SECRET instead and the
+   * client keeps it in localStorage.
+   */
+  key?: string;
   context?: Record<string, unknown> | ((el: Element) => unknown) | null;
 }
 
