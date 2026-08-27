@@ -32,6 +32,12 @@ Want an exact file and line? Stamp `data-src="File.tsx:112"` on your components
 at build time — the client forwards every `data-*` attribute automatically, so
 no client change is needed.
 
+## Versioning
+
+Bump `version` in `package.json` on every change. Webpack (and so Next) snapshots
+`node_modules` by package version, not by file contents — a same-version
+reinstall is served from `.next/cache` and your fix silently does not ship.
+
 ## Install
 
 ```bash
