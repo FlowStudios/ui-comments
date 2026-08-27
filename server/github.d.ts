@@ -5,6 +5,12 @@ export interface UICommentsConfig {
   token?: string;
   /** Created if missing. Pass null to file unlabelled issues. */
   label?: string | null;
+  /**
+   * Standing instructions rendered as a blockquote above every note, so an
+   * agent handed only the issue URL knows how this repo expects to be worked.
+   * Defaults to $UI_COMMENTS_INSTRUCTIONS.
+   */
+  instructions?: string;
   /** Prepended to the issue title. Default "[UI] ". */
   titlePrefix?: string;
   assignees?: string[];
@@ -48,6 +54,6 @@ export function createIssue(
   config: UICommentsConfig,
 ): Promise<{ status: number; body: { ok?: true; number?: number; url?: string; error?: string } }>;
 
-export function bodyFrom(payload: UICommentPayload): string;
+export function bodyFrom(payload: UICommentPayload, instructions?: string): string;
 export function titleFrom(comment: string, prefix: string): string;
 export function validate(payload: UICommentPayload): string | null;

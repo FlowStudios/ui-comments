@@ -28,6 +28,11 @@ if (!defined('UI_COMMENTS_LABEL')) {
 if (!defined('UI_COMMENTS_KEY')) {
     define('UI_COMMENTS_KEY', getenv('UI_COMMENTS_KEY') ?: '');
 }
+// Standing instructions rendered as a blockquote above every note, so whoever
+// picks the issue up knows how this repo expects to be worked. Newlines allowed.
+if (!defined('UI_COMMENTS_INSTRUCTIONS')) {
+    define('UI_COMMENTS_INSTRUCTIONS', getenv('UI_COMMENTS_INSTRUCTIONS') ?: '');
+}
 
 header('Content-Type: application/json');
 
@@ -128,7 +133,14 @@ $title = '[UI] ' . uic_clip($first, 80);
 $pagePath = isset($page['path']) ? $page['path'] : (isset($page['url']) ? $page['url'] : '');
 $pageUrl  = isset($page['url']) ? $page['url'] : '';
 
-$body  = uic_clip($p['comment'], 4000) . "\n\n---\n\n### Element\n\n";
+$body = '';
+if (UI_COMMENTS_INSTRUCTIONS !== '') {
+    foreach (preg_split('/\r?\n/', trim(UI_COMMENTS_INSTRUCTIONS)) as $line) {
+        $body .= rtrim('> ' . $line) . "\n";
+    }
+    $body .= "\n";
+}
+$body .= uic_clip($p['comment'], 4000) . "\n\n---\n\n### Element\n\n";
 $body .= "| | |\n|---|---|\n";
 $body .= uic_row('Page', $pageUrl ? '[`' . $pagePath . '`](' . $pageUrl . ')' : '');
 $body .= uic_row('Tag', isset($el['tag']) ? '`<' . $el['tag'] . '>`' : '');

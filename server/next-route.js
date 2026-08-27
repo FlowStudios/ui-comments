@@ -84,6 +84,9 @@ function createUiCommentRoute(config = {}) {
       label: config.label,
       titlePrefix: config.titlePrefix,
       assignees: config.assignees,
+      instructions: config.instructions !== undefined
+        ? config.instructions
+        : process.env.UI_COMMENTS_INSTRUCTIONS,
     });
     return Response.json(out.body, { status: out.status });
   };

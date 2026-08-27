@@ -127,6 +127,26 @@ If the app already has auth, put the route behind it and skip the key.
 | `⌘/Ctrl` + `Enter` | create the issue |
 | `Esc` | close the note, then exit comment mode |
 
+## Standing instructions
+
+Every issue can open with a blockquote telling whoever picks it up how the repo
+expects to be worked — so an agent handed nothing but the issue URL still has
+its bearings. Set `instructions` (or `$UI_COMMENTS_INSTRUCTIONS`), newlines
+allowed:
+
+```js
+export const POST = createUiCommentRoute({
+  instructions: [
+    'Read the repo README and CLAUDE.md before editing.',
+    'Reproduce on the live page first, then fix at the component level.',
+    'Comment on this issue with what you found, and close it from the PR.',
+  ].join('\n'),
+});
+```
+
+Keep it a pointer, not a manual — it is repeated on every issue, and the repo's
+own docs are the detail.
+
 ## Extra context
 
 Pass `context` to attach app state (current user, tenant, feature flags) to
@@ -163,6 +183,7 @@ own endpoint.
 | `token` | `$UI_COMMENTS_GH_TOKEN` | fine-grained PAT |
 | `key` | `$UI_COMMENTS_KEY` | shared secret; unset = open endpoint |
 | `requireKey` | `false` | 503 rather than run open |
+| `instructions` | `$UI_COMMENTS_INSTRUCTIONS` | blockquote above every note |
 | `rateLimit` | 20 / 10 min | `{ max, windowMs }`, or `null` |
 | `label` | `ui-comment` | created if missing; `null` for none |
 | `titlePrefix` | `[UI] ` | |

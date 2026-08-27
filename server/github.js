@@ -73,7 +73,19 @@ function grepHint(el) {
 /* The issue body is written for whoever picks the issue up — a person or
    Claude Code. Everything needed to locate the element in source, nothing
    that needs the original browser session. */
-function bodyFrom(p) {
+/* Standing instructions for whoever picks the issue up — rendered as a
+   blockquote above the note so an agent handed nothing but this issue URL still
+   knows how the repo expects to be worked. Kept to a pointer plus the few
+   things specific to element comments; the repo's own docs are the detail. */
+function preambleFrom(instructions) {
+  if (!instructions) {
+    return null;
+  }
+  const lines = String(instructions).trim().split('\n');
+  return lines.map((line) => `> ${line}`.trimEnd()).join('\n');
+}
+
+function bodyFrom(p, instructions) {
   const el = p.element || {};
   const page = p.page || {};
   const vp = p.viewport || {};
@@ -82,6 +94,11 @@ function bodyFrom(p) {
   const attrRows = Object.keys(attrs).map((k) => [k, `\`${attrs[k]}\``]);
 
   const out = [];
+  const preamble = preambleFrom(instructions);
+  if (preamble) {
+    out.push(preamble);
+    out.push('');
+  }
   out.push(truncate(p.comment, MAX_COMMENT));
   out.push('');
   out.push('---');
@@ -223,7 +240,7 @@ async function createIssue(payload, config) {
 
   const issue = {
     title: titleFrom(payload.comment, config.titlePrefix != null ? config.titlePrefix : '[UI] '),
-    body: bodyFrom(payload),
+    body: bodyFrom(payload, config.instructions),
   };
   if (labels.length) {
     issue.labels = labels;
