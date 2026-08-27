@@ -1,0 +1,33 @@
+{
+  "name": "ui-comments",
+  "version": "0.1.0",
+  "description": "Click an element on a live page, leave a note, get a GitHub issue with everything needed to find it in source.",
+  "license": "UNLICENSED",
+  "private": false,
+  "main": "server/github.js",
+  "files": [
+    "client",
+    "react",
+    "server",
+    "README.md"
+  ],
+  "exports": {
+    ".": "./server/github.js",
+    "./client/ui-comments.js": "./client/ui-comments.js",
+    "./react/UIComments": "./react/UIComments.js",
+    "./server/github": "./server/github.js",
+    "./server/next-route": "./server/next-route.js"
+  },
+  "keywords": ["github", "issues", "feedback", "ui", "design-review"],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/FlowStudios/ui-comments.git"
+  },
+  "peerDependencies": {
+    "react": ">=18"
+  },
+  "peerDependenciesMeta": {
+    "react": { "optional": true }
+  },
+  "engines": { "node": ">=18" }
+}
