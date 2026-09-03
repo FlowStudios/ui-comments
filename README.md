@@ -120,6 +120,10 @@ If the app already has auth, put the route behind it and skip the key.
 
 ## Keys
 
+Clicking the pill does not dismiss host menus — arm comment mode first, then
+pick the open dropdown. A pick click is swallowed so it does not fire the
+item or close the menu.
+
 | | |
 |---|---|
 | click | pick the element under the cursor |
