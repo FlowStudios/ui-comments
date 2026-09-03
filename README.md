@@ -2,7 +2,7 @@
 
 Claude Design's COMMENT button, for sites that already shipped.
 
-Arm the page, click the **Comment** pill, hover any element (it highlights),
+Arm the page, click the **Feedback** pill, hover any element (it highlights),
 click it, type what should change. A GitHub issue is created with the page URL,
 the element's full class list, a `nth-of-type` DOM path, its text, and its
 rendered HTML — everything needed to find it in source without the browser

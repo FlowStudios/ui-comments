@@ -280,7 +280,7 @@
     });
     btn.type = 'button';
     btn.setAttribute('data-' + NS + '-pill', '1');
-    btn.innerHTML = '<span style="font-size:14px">&#128172;</span><span data-' + NS + '-pill-text>Comment</span>';
+    btn.innerHTML = '<span style="font-size:14px">&#128172;</span><span data-' + NS + '-pill-text>Feedback</span>';
     /* Host menus close on document mousedown. The click handler's
        stopPropagation is too late — that down already dismissed them. */
     ['mousedown', 'pointerdown', 'touchstart'].forEach(function (name) {
@@ -307,7 +307,7 @@
     }
     var text = state.pillEl.querySelector('[data-' + NS + '-pill-text]');
     if (text) {
-      text.textContent = on ? 'Pick an element — Esc to exit' : 'Comment';
+      text.textContent = on ? 'Pick an element — Esc to exit' : 'Feedback';
     }
     css(state.pillEl, {
       background: on ? '#7c9cff' : '#171a24',
