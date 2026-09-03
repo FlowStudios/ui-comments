@@ -1,6 +1,6 @@
 {
   "name": "ui-comments",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Click an element on a live page, leave a note, get a GitHub issue with everything needed to find it in source.",
   "license": "UNLICENSED",
   "private": false,

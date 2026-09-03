@@ -281,6 +281,16 @@
     btn.type = 'button';
     btn.setAttribute('data-' + NS + '-pill', '1');
     btn.innerHTML = '<span style="font-size:14px">&#128172;</span><span data-' + NS + '-pill-text>Comment</span>';
+    /* Host menus close on document mousedown. The click handler's
+       stopPropagation is too late — that down already dismissed them. */
+    ['mousedown', 'pointerdown', 'touchstart'].forEach(function (name) {
+      btn.addEventListener(name, function (e) {
+        e.stopPropagation();
+        if (name === 'mousedown') {
+          e.preventDefault();
+        }
+      });
+    });
     btn.addEventListener('click', function (e) {
       e.preventDefault();
       e.stopPropagation();
@@ -671,7 +681,11 @@
   var SWALLOW = ['mousedown', 'mouseup', 'dblclick', 'submit', 'pointerdown', 'pointerup'];
 
   function swallow(e) {
-    if (state.on && !ours(e.target)) {
+    if (ours(e.target)) {
+      e.stopPropagation();
+      return;
+    }
+    if (state.on) {
       e.preventDefault();
       e.stopPropagation();
     }
